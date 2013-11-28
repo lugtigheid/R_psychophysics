@@ -16,12 +16,8 @@ boot.fun <- function (data, nboot, cuts = c(.025, 0.159, .5, 0.841 ,.975 ) ) {
   # resample these data from a binomial distribution
   samples <- matrix(rbinom(nrow(d)*nboot, d$n, d$resp/d$n), ncol=nboot)
   
-  pb <- txtProgressBar(style=3, min=0, max=nboot, label="Bootstrap")
-  
   # we use the sapply function to replicate the optimisation
   sim <- sapply(seq_len(nboot),function(n) {
-    
-    setTxtProgressBar(pb, n)
     
     # this is the optimisation result for this run
     r <- optim(c(1,1), boot.loglikeli, d=data, s=samples[,n])
@@ -29,8 +25,6 @@ boot.fun <- function (data, nboot, cuts = c(.025, 0.159, .5, 0.841 ,.975 ) ) {
     # return only the parameters
     return(r$par)
   })
-  
-  close(pb)
   
   # calculate the percentiles (CI's) for mu and sigma
   mu = quantile(sim[1,], cuts)
